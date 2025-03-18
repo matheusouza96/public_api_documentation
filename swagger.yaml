@@ -6,80 +6,85 @@ info:
 servers:
   - url: https://api.enlizt.com/v1
     description: Servidor de produção
+tags:
+- name: Rotas Públicas
+  description: Não exigem autenticação
 paths:
   /public/feed/{subdomain}/positions:
     get:
+      tags:
+      - Rotas Públicas
       summary: Listagem de vagas
       description: | 
-            ## Descrição
-            Este endpoint retorna a lista de vagas publicadas pela empresa. Vagas ocultas não são incluídas.  
+        ## Descrição
+        Este endpoint retorna a lista de vagas publicadas pela empresa. Vagas ocultas não são incluídas.  
 
-            ## Parâmetros  
+        ## Parâmetros  
 
-            ### Parâmetros de Caminho  
-            - **subdomain** (obrigatório): Subdomínio utilizado para identificar a empresa na página de vagas.  
-              - **Exemplo**: `sestsenat`  
+        ### Parâmetros de Caminho  
+        - **subdomain** (obrigatório): Subdomínio utilizado para identificar a empresa na página de vagas.  
+          - **Exemplo**: `sestsenat`  
 
-            ### Parâmetros de Consulta  
+        ### Parâmetros de Consulta  
 
-            - **show** (opcional): Define quais vagas devem ser retornadas. Valores aceitos:  
-              - `hiring`: Somente vagas ativas que estão aceitando candidaturas (valor padrão).  
-              - `selecting`: Somente vagas ativas que não estão aceitando novas candidaturas.  
-              - `open`: Todas as vagas ativas, independente do estado de aceitação de novas candidaturas.  
-              - `closed`: Vagas arquivadas há menos de 1 ano.  
-              - `all`: Todas as vagas ativas e arquivadas há menos de 1 ano.  
+        - **show** (opcional): Define quais vagas devem ser retornadas. Valores aceitos:  
+          - `hiring`: Somente vagas ativas que estão aceitando candidaturas (valor padrão).  
+          - `selecting`: Somente vagas ativas que não estão aceitando novas candidaturas.  
+          - `open`: Todas as vagas ativas, independente do estado de aceitação de novas candidaturas.  
+          - `closed`: Vagas arquivadas há menos de 1 ano.  
+          - `all`: Todas as vagas ativas e arquivadas há menos de 1 ano.  
 
-            - **search** (opcional): Filtra a lista de vagas pelo título ou código da vaga.  
-              - **Limite**: 50 caracteres.  
-              - **Observação**: A busca ignora diacríticos e maiúsculas.  
+        - **search** (opcional): Filtra a lista de vagas pelo título ou código da vaga.  
+          - **Limite**: 50 caracteres.  
+          - **Observação**: A busca ignora diacríticos e maiúsculas.  
 
-            - **location** (opcional): Filtra a lista pelo local da vaga.  
-              - **Limite**: 50 caracteres.  
-              - **Observação**: Ignora diacríticos e maiúsculas. Para buscar por vagas remotas, o valor deve ser `"remote"`.  
+        - **location** (opcional): Filtra a lista pelo local da vaga.  
+          - **Limite**: 50 caracteres.  
+          - **Observação**: Ignora diacríticos e maiúsculas. Para buscar por vagas remotas, o valor deve ser `"remote"`.  
 
-            - **department** (opcional): Filtra a lista pelo departamento da vaga.  
-              - **Limite**: 50 caracteres.  
-              - **Padrão**: Requer correspondência exata, ignorando diacríticos e maiúsculas.  
-              - **Busca parcial**: Se iniciar com `"~"`, busca departamentos que contenham o valor.  
-                - **Exemplo**: `"~log"` retorna vagas dos departamentos `"tecnologia"` e `"logística"`.  
+        - **department** (opcional): Filtra a lista pelo departamento da vaga.  
+          - **Limite**: 50 caracteres.  
+          - **Padrão**: Requer correspondência exata, ignorando diacríticos e maiúsculas.  
+          - **Busca parcial**: Se iniciar com `"~"`, busca departamentos que contenham o valor.  
+            - **Exemplo**: `"~log"` retorna vagas dos departamentos `"tecnologia"` e `"logística"`.  
 
-            - **order** (opcional): Define a ordenação da lista de vagas. Valores aceitos:  
-              - `title`: Crescente pelo título da vaga (valor padrão).  
-              - `title_desc`: Decrescente pelo título da vaga.  
-              - `date`: Crescente pela data de publicação.  
-              - `date_desc`: Decrescente pela data de publicação.  
-              - `status_title`: Crescente pelo título, com vagas ativas primeiro (aceitando candidaturas com precedência).  
-              - `status_title_desc`: Decrescente pelo título, com vagas ativas primeiro (aceitando candidaturas com precedência).  
-              - `status_date`: Crescente pela data, com vagas ativas primeiro (aceitando candidaturas com precedência).  
-              - `status_date_desc`: Decrescente pela data, com vagas ativas primeiro (aceitando candidaturas com precedência).  
+        - **order** (opcional): Define a ordenação da lista de vagas. Valores aceitos:  
+          - `title`: Crescente pelo título da vaga (valor padrão).  
+          - `title_desc`: Decrescente pelo título da vaga.  
+          - `date`: Crescente pela data de publicação.  
+          - `date_desc`: Decrescente pela data de publicação.  
+          - `status_title`: Crescente pelo título, com vagas ativas primeiro (aceitando candidaturas com precedência).  
+          - `status_title_desc`: Decrescente pelo título, com vagas ativas primeiro (aceitando candidaturas com precedência).  
+          - `status_date`: Crescente pela data, com vagas ativas primeiro (aceitando candidaturas com precedência).  
+          - `status_date_desc`: Decrescente pela data, com vagas ativas primeiro (aceitando candidaturas com precedência).  
 
-            - **limit** (opcional): Número de vagas a serem retornadas por resposta.  
-              - **Padrão**: `100`  
+        - **limit** (opcional): Número de vagas a serem retornadas por resposta.  
+          - **Padrão**: `100`  
 
-            - **page** (opcional): Número da página para paginação da listagem.  
-              - **Padrão**: `1`  
+        - **page** (opcional): Número da página para paginação da listagem.  
+          - **Padrão**: `1`  
 
-            ## Detalhes da Resposta  
+        ## Detalhes da Resposta  
 
-            A resposta retorna um objeto contendo:  
+        A resposta retorna um objeto contendo:  
 
-            - **positions**: Array com a listagem de vagas disponíveis conforme os filtros aplicados. Cada item contém:  
-              - **code**: `string` - Código da vaga.  
-              - **title**: `string` - Título da vaga.  
-              - **department**: `string` - Departamento da vaga.  
-              - **location**: `string` - Local da vaga no formato `"Cidade, Sigla do Estado"`. Se for vaga remota, pode ser `null`.  
-              - **workplace**: `string` - Natureza do local de trabalho. Valores possíveis:  
-                - `'on-site'` (trabalho presencial)  
-                - `'remote'` (trabalho totalmente remoto)  
-                - `'hybrid'` (parcialmente presencial, parcialmente remoto)  
-              - **date**: `string` - Data de publicação da vaga no formato ISO 8601 (`YYYY-MM-DDTHH:mm:ss.sssZ`).  
-              - **isPublicAnnouncement**: `boolean` - Indica se o fluxo utiliza modo edital.
-              - **applicationDeadline**: `string` - Data limite para candidatura na vaga no formato ISO 8601 (`YYYY-MM-DDTHH:mm:ss.sssZ`). Pode ser `null` se não houver data limite.
-              - **allowNewApplications**: `boolean` - Indica se a vaga está recebendo novas candidaturas. Será sempre `false` se a vaga estiver arquivada (`active=false`).  
-              - **active**: `boolean` - Indica se a vaga está ativa ou arquivada.  
-              - **link**: `string` - URL para acessar a página da vaga na Plooral.  
+        - **positions**: Array com a listagem de vagas disponíveis conforme os filtros aplicados. Cada item contém:  
+          - **code**: `string` - Código da vaga.  
+          - **title**: `string` - Título da vaga.  
+          - **department**: `string` - Departamento da vaga.  
+          - **location**: `string` - Local da vaga no formato `"Cidade, Sigla do Estado"`. Se for vaga remota, pode ser `null`.  
+          - **workplace**: `string` - Natureza do local de trabalho. Valores possíveis:  
+            - `'on-site'` (trabalho presencial)  
+            - `'remote'` (trabalho totalmente remoto)  
+            - `'hybrid'` (parcialmente presencial, parcialmente remoto)  
+          - **date**: `string` - Data de publicação da vaga no formato ISO 8601 (`YYYY-MM-DDTHH:mm:ss.sssZ`).  
+          - **isPublicAnnouncement**: `boolean` - Indica se o fluxo utiliza modo edital.
+          - **applicationDeadline**: `string` - Data limite para candidatura na vaga no formato ISO 8601 (`YYYY-MM-DDTHH:mm:ss.sssZ`). Pode ser `null` se não houver data limite.
+          - **allowNewApplications**: `boolean` - Indica se a vaga está recebendo novas candidaturas. Será sempre `false` se a vaga estiver arquivada (`active=false`).  
+          - **active**: `boolean` - Indica se a vaga está ativa ou arquivada.  
+          - **link**: `string` - URL para acessar a página da vaga na Plooral.  
 
-            - **total**: `integer` - Total de vagas considerando os filtros aplicados. Útil para paginação.  
+        - **total**: `integer` - Total de vagas considerando os filtros aplicados. Útil para paginação.  
       parameters:
       - name: subdomain
         in: path
@@ -141,6 +146,7 @@ paths:
           default: 1
       responses:
         '200':
+          description: "success"
           content:
             application/json:
               schema:
@@ -189,46 +195,48 @@ paths:
                   total:
                     type: integer
                     example: 143
-  /public/feed/{subdomain}/positions/code:
+  /public/feed/{subdomain}/positions/{code}:
     get:
+      tags:
+      - Rotas Públicas
       summary: Detalhes da vaga
       description: | 
-            ## Descrição
-            Este endpoint retorna dados complementares de uma vaga específica publicada pela empresa. Vaga oculta não é apresentada.
+        ## Descrição
+        Este endpoint retorna dados complementares de uma vaga específica publicada pela empresa. Vaga oculta não é apresentada.
 
-            ## Parâmetros
+        ## Parâmetros
 
-            ### Parâmetros de Caminho
-            - **subdomain (obrigatório)**: Subdomínio utilizado para identificar a empresa na página de vagas (exemplo: sestsenat).
-            - **code (obrigatório)**: Código da vaga. Pode ser obtido a partir da API de listagem de vagas.
+        ### Parâmetros de Caminho
+        - **subdomain (obrigatório)**: Subdomínio utilizado para identificar a empresa na página de vagas (exemplo: sestsenat).
+        - **code (obrigatório)**: Código da vaga. Pode ser obtido a partir da API de listagem de vagas.
 
-            ## Detalhes da Resposta
-            - **code**: String com o código da vaga.
-            - **title**: String com o título da vaga.
-            - **department**: String com o departamento da vaga.
-            - **location**: String com o local da vaga, no formato "Cidade, Sigla do Estado". Se for vaga remota poderá ser `null`.
-            - **workplace**: String que indica a natureza do local de trabalho. Pode ser 'on-site' (trabalho presencial), 'remote' (trabalho totalmente remoto), 'hybrid' (parcialmente presencial, parcialmente remoto).
-            - **date**: String com a data de publicação da vaga, no formato ISO 8601 com 24 caracteres (YYYY-MM-DDTHH:mm:ss.sssZ).
-            - **isPublicAnnouncement**: Booleano que indica se o fluxo utiliza o modo edital.
-            - **allowNewApplications**: Booleano que indica se a vaga está recebendo novas candidaturas. Será sempre `false` se a vaga estiver arquivada (`active=false`).
-            - **active**: Booleano que indica se a vaga está ativa ou arquivada.
-            - **type**: String que indica o tipo de trabalho. Pode ser:
-              - `full_time`: Tempo integral
-              - `part_time`: Meio período
-              - `contractor`: Terceirizado
-              - `temporary`: Temporário
-              - `inter`: Estagiário
-              - `volunteer`: Voluntário
-              - `per_diem`: Diarista
-              - `other`: Outro
-            - **salary**: String com o salário. Pode ser um texto (ex: "Competitivo"), um intervalo indicando o período (ex: "Entre R$120.000,00 e R$150.000,00 anual"), ou um valor com o período (ex: "R$10.000,00 mensal").
-            - **details**: String contendo a descrição da vaga no formato markdown.
-            - **skills**: Array de strings com as competências exigidas pela vaga.
-            - **languages**: Array de strings com os idiomas exigidos pela vaga.
-            - **files**: Array de objetos dos arquivos associados à vaga. Cada objeto tem as chaves:
-              - `name`: String com a descrição do arquivo.
-              - `source`: String com a URL para o arquivo.
-            - **link**: String com a URL para acessar a página para candidatar-se à vaga na Plooral.
+        ## Detalhes da Resposta
+        - **code**: String com o código da vaga.
+        - **title**: String com o título da vaga.
+        - **department**: String com o departamento da vaga.
+        - **location**: String com o local da vaga, no formato "Cidade, Sigla do Estado". Se for vaga remota poderá ser `null`.
+        - **workplace**: String que indica a natureza do local de trabalho. Pode ser 'on-site' (trabalho presencial), 'remote' (trabalho totalmente remoto), 'hybrid' (parcialmente presencial, parcialmente remoto).
+        - **date**: String com a data de publicação da vaga, no formato ISO 8601 com 24 caracteres (YYYY-MM-DDTHH:mm:ss.sssZ).
+        - **isPublicAnnouncement**: Booleano que indica se o fluxo utiliza o modo edital.
+        - **allowNewApplications**: Booleano que indica se a vaga está recebendo novas candidaturas. Será sempre `false` se a vaga estiver arquivada (`active=false`).
+        - **active**: Booleano que indica se a vaga está ativa ou arquivada.
+        - **type**: String que indica o tipo de trabalho. Pode ser:
+          - `full_time`: Tempo integral
+          - `part_time`: Meio período
+          - `contractor`: Terceirizado
+          - `temporary`: Temporário
+          - `inter`: Estagiário
+          - `volunteer`: Voluntário
+          - `per_diem`: Diarista
+          - `other`: Outro
+        - **salary**: String com o salário. Pode ser um texto (ex: "Competitivo"), um intervalo indicando o período (ex: "Entre R$120.000,00 e R$150.000,00 anual"), ou um valor com o período (ex: "R$10.000,00 mensal").
+        - **details**: String contendo a descrição da vaga no formato markdown.
+        - **skills**: Array de strings com as competências exigidas pela vaga.
+        - **languages**: Array de strings com os idiomas exigidos pela vaga.
+        - **files**: Array de objetos dos arquivos associados à vaga. Cada objeto tem as chaves:
+          - `name`: String com a descrição do arquivo.
+          - `source`: String com a URL para o arquivo.
+        - **link**: String com a URL para acessar a página para candidatar-se à vaga na Plooral.
       parameters:
       - name: subdomain
         in: path
@@ -246,6 +254,7 @@ paths:
           example: 2080573
       responses:
         '200':
+          description: "success"
           content:
             application/json:
               schema:
