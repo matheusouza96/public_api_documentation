@@ -1,0 +1,319 @@
+{
+  "openapi" : "3.0.0",
+  "info" : {
+    "title" : "Listagem e detalhes de vagas",
+    "description" : "API para listagem e detalhes de vagas",
+    "version" : "1.0.0"
+  },
+  "servers" : [ {
+    "url" : "https://api.enlizt.com/v1",
+    "description" : "Servidor de produção"
+  } ],
+  "tags" : [ {
+    "name" : "Rotas Públicas",
+    "description" : "Não exigem autenticação"
+  } ],
+  "paths" : {
+    "/public/feed/{subdomain}/positions" : {
+      "get" : {
+        "tags" : [ "Rotas Públicas" ],
+        "summary" : "Listagem de vagas editado",
+        "description" : "## Descrição\nEste endpoint retorna a lista de vagas publicadas pela empresa. Vagas ocultas não são incluídas.  \n\n## Parâmetros  \n\n### Parâmetros de Caminho  \n- **subdomain** (obrigatório): Subdomínio utilizado para identificar a empresa na página de vagas.  \n  - **Exemplo**: `sestsenat`  \n\n### Parâmetros de Consulta  \n\n- **show** (opcional): Define quais vagas devem ser retornadas. Valores aceitos:  \n  - `hiring`: Somente vagas ativas que estão aceitando candidaturas (valor padrão).  \n  - `selecting`: Somente vagas ativas que não estão aceitando novas candidaturas.  \n  - `open`: Todas as vagas ativas, independente do estado de aceitação de novas candidaturas.  \n  - `closed`: Vagas arquivadas há menos de 1 ano.  \n  - `all`: Todas as vagas ativas e arquivadas há menos de 1 ano.  \n\n- **search** (opcional): Filtra a lista de vagas pelo título ou código da vaga.  \n  - **Limite**: 50 caracteres.  \n  - **Observação**: A busca ignora diacríticos e maiúsculas.  \n\n- **location** (opcional): Filtra a lista pelo local da vaga.  \n  - **Limite**: 50 caracteres.  \n  - **Observação**: Ignora diacríticos e maiúsculas. Para buscar por vagas remotas, o valor deve ser `\"remote\"`.  \n\n- **department** (opcional): Filtra a lista pelo departamento da vaga.  \n  - **Limite**: 50 caracteres.  \n  - **Padrão**: Requer correspondência exata, ignorando diacríticos e maiúsculas.  \n  - **Busca parcial**: Se iniciar com `\"~\"`, busca departamentos que contenham o valor.  \n    - **Exemplo**: `\"~log\"` retorna vagas dos departamentos `\"tecnologia\"` e `\"logística\"`.  \n\n- **order** (opcional): Define a ordenação da lista de vagas. Valores aceitos:  \n  - `title`: Crescente pelo título da vaga (valor padrão).  \n  - `title_desc`: Decrescente pelo título da vaga.  \n  - `date`: Crescente pela data de publicação.  \n  - `date_desc`: Decrescente pela data de publicação.  \n  - `status_title`: Crescente pelo título, com vagas ativas primeiro (aceitando candidaturas com precedência).  \n  - `status_title_desc`: Decrescente pelo título, com vagas ativas primeiro (aceitando candidaturas com precedência).  \n  - `status_date`: Crescente pela data, com vagas ativas primeiro (aceitando candidaturas com precedência).  \n  - `status_date_desc`: Decrescente pela data, com vagas ativas primeiro (aceitando candidaturas com precedência).  \n\n- **limit** (opcional): Número de vagas a serem retornadas por resposta.  \n  - **Padrão**: `100`  \n\n- **page** (opcional): Número da página para paginação da listagem.  \n  - **Padrão**: `1`  \n\n## Detalhes da Resposta  \n\nA resposta retorna um objeto contendo:  \n\n- **positions**: Array com a listagem de vagas disponíveis conforme os filtros aplicados. Cada item contém:  \n  - **code**: `string` - Código da vaga.  \n  - **title**: `string` - Título da vaga.  \n  - **department**: `string` - Departamento da vaga.  \n  - **location**: `string` - Local da vaga no formato `\"Cidade, Sigla do Estado\"`. Se for vaga remota, pode ser `null`.  \n  - **workplace**: `string` - Natureza do local de trabalho. Valores possíveis:  \n    - `'on-site'` (trabalho presencial)  \n    - `'remote'` (trabalho totalmente remoto)  \n    - `'hybrid'` (parcialmente presencial, parcialmente remoto)  \n  - **date**: `string` - Data de publicação da vaga no formato ISO 8601 (`YYYY-MM-DDTHH:mm:ss.sssZ`).  \n  - **isPublicAnnouncement**: `boolean` - Indica se o fluxo utiliza modo edital.\n  - **applicationDeadline**: `string` - Data limite para candidatura na vaga no formato ISO 8601 (`YYYY-MM-DDTHH:mm:ss.sssZ`). Pode ser `null` se não houver data limite.\n  - **allowNewApplications**: `boolean` - Indica se a vaga está recebendo novas candidaturas. Será sempre `false` se a vaga estiver arquivada (`active=false`).  \n  - **active**: `boolean` - Indica se a vaga está ativa ou arquivada.  \n  - **link**: `string` - URL para acessar a página da vaga na Plooral.  \n\n- **total**: `integer` - Total de vagas considerando os filtros aplicados. Útil para paginação.  \n",
+        "parameters" : [ {
+          "name" : "subdomain",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "example" : "zentech"
+          }
+        }, {
+          "name" : "show",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "default" : "hiring",
+            "enum" : [ "hiring", "selecting", "open", "closed", "all" ]
+          }
+        }, {
+          "name" : "search",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "maxLength" : 50,
+            "type" : "string"
+          }
+        }, {
+          "name" : "location",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "maxLength" : 50,
+            "type" : "string"
+          }
+        }, {
+          "name" : "department",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "maxLength" : 50,
+            "type" : "string"
+          }
+        }, {
+          "name" : "order",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "default" : "title",
+            "enum" : [ "title", "title_desc", "date", "date_desc", "status_title", "status_title_desc", "status_date", "status_date_desc" ]
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "default" : 100
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "default" : 1
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "success",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/feed/{subdomain}/positions/{code}" : {
+      "get" : {
+        "tags" : [ "Rotas Públicas" ],
+        "summary" : "Detalhes da vaga",
+        "description" : "## Descrição\nEste endpoint retorna dados complementares de uma vaga específica publicada pela empresa. Vaga oculta não é apresentada.\n\n## Parâmetros\n\n### Parâmetros de Caminho\n- **subdomain (obrigatório)**: Subdomínio utilizado para identificar a empresa na página de vagas (exemplo: sestsenat).\n- **code (obrigatório)**: Código da vaga. Pode ser obtido a partir da API de listagem de vagas.\n\n## Detalhes da Resposta\n- **code**: String com o código da vaga.\n- **title**: String com o título da vaga.\n- **department**: String com o departamento da vaga.\n- **location**: String com o local da vaga, no formato \"Cidade, Sigla do Estado\". Se for vaga remota poderá ser `null`.\n- **workplace**: String que indica a natureza do local de trabalho. Pode ser 'on-site' (trabalho presencial), 'remote' (trabalho totalmente remoto), 'hybrid' (parcialmente presencial, parcialmente remoto).\n- **date**: String com a data de publicação da vaga, no formato ISO 8601 com 24 caracteres (YYYY-MM-DDTHH:mm:ss.sssZ).\n- **isPublicAnnouncement**: Booleano que indica se o fluxo utiliza o modo edital.\n- **allowNewApplications**: Booleano que indica se a vaga está recebendo novas candidaturas. Será sempre `false` se a vaga estiver arquivada (`active=false`).\n- **active**: Booleano que indica se a vaga está ativa ou arquivada.\n- **type**: String que indica o tipo de trabalho. Pode ser:\n  - `full_time`: Tempo integral\n  - `part_time`: Meio período\n  - `contractor`: Terceirizado\n  - `temporary`: Temporário\n  - `inter`: Estagiário\n  - `volunteer`: Voluntário\n  - `per_diem`: Diarista\n  - `other`: Outro\n- **salary**: String com o salário. Pode ser um texto (ex: \"Competitivo\"), um intervalo indicando o período (ex: \"Entre R$120.000,00 e R$150.000,00 anual\"), ou um valor com o período (ex: \"R$10.000,00 mensal\").\n- **details**: String contendo a descrição da vaga no formato markdown.\n- **skills**: Array de strings com as competências exigidas pela vaga.\n- **languages**: Array de strings com os idiomas exigidos pela vaga.\n- **files**: Array de objetos dos arquivos associados à vaga. Cada objeto tem as chaves:\n  - `name`: String com a descrição do arquivo.\n  - `source`: String com a URL para o arquivo.\n- **link**: String com a URL para acessar a página para candidatar-se à vaga na Plooral.\n",
+        "parameters" : [ {
+          "name" : "subdomain",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "example" : "zentech"
+          }
+        }, {
+          "name" : "code",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "example" : "2080573"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "success",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_1"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "inline_response_200" : {
+        "type" : "object",
+        "properties" : {
+          "positions" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "code" : {
+                  "type" : "string",
+                  "example" : "2080573"
+                },
+                "title" : {
+                  "type" : "string",
+                  "example" : "Auxiliar de Almoxarifado"
+                },
+                "department" : {
+                  "type" : "string",
+                  "example" : "Administrativo"
+                },
+                "location" : {
+                  "type" : "string",
+                  "example" : "São José, SC"
+                },
+                "workplace" : {
+                  "type" : "string",
+                  "example" : "on-site"
+                },
+                "date" : {
+                  "type" : "string",
+                  "format" : "date-time",
+                  "example" : "2021-08-18T20:24:02.951Z"
+                },
+                "applicationDeadline" : {
+                  "type" : "string",
+                  "format" : "date-time"
+                },
+                "isPublicAnnouncement" : {
+                  "type" : "boolean",
+                  "example" : false
+                },
+                "allowNewApplications" : {
+                  "type" : "boolean",
+                  "example" : true
+                },
+                "active" : {
+                  "type" : "boolean",
+                  "example" : true
+                },
+                "link" : {
+                  "type" : "string",
+                  "example" : "https://zentech.plooral.live/vagas/auxiliar_de_almoxarifado-010420"
+                }
+              }
+            }
+          },
+          "total" : {
+            "type" : "integer",
+            "example" : 143
+          }
+        }
+      },
+      "inline_response_200_1" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string",
+            "example" : "2068889"
+          },
+          "title" : {
+            "type" : "string",
+            "example" : "Consultor Comercial"
+          },
+          "department" : {
+            "type" : "string",
+            "example" : "Administrativo"
+          },
+          "location" : {
+            "type" : "string",
+            "example" : "São José dos Basílios, MA"
+          },
+          "workplace" : {
+            "type" : "string",
+            "example" : "on-site"
+          },
+          "date" : {
+            "type" : "string",
+            "format" : "date-time",
+            "example" : "2020-10-02T17:49:02.934Z"
+          },
+          "applicationDeadline" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "isPublicAnnouncement" : {
+            "type" : "boolean",
+            "example" : false
+          },
+          "allowNewApplications" : {
+            "type" : "boolean",
+            "example" : true
+          },
+          "active" : {
+            "type" : "boolean",
+            "example" : true
+          },
+          "type" : {
+            "type" : "string",
+            "example" : "full_time",
+            "enum" : [ "full_time", "part_time", "contractor", "temporary", "inter", "volunteer", "per_diem", "other" ]
+          },
+          "salary" : {
+            "type" : "string",
+            "example" : "R$50.000,00 semanal"
+          },
+          "details" : {
+            "type" : "string",
+            "example" : "Descrição da vaga em markdown."
+          },
+          "skills" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "example" : "[\"Vendas\",\"Comercial\"]"
+            }
+          },
+          "languages" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "example" : "[\"Inglês\",\"Alemão\"]"
+            }
+          },
+          "files" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "name" : {
+                  "type" : "string",
+                  "example" : "Documento de Apresentação"
+                },
+                "source" : {
+                  "type" : "string",
+                  "example" : "https://zentech.plooral.live/vagas"
+                }
+              }
+            }
+          },
+          "link" : {
+            "type" : "string",
+            "example" : "https://zentech.plooral.live/vagas/8b13ea30-04d7-11eb-9aec-abd2b4aa5bba/candidatar"
+          }
+        }
+      }
+    }
+  }
+}
