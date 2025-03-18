@@ -14,7 +14,7 @@ paths:
     get:
       tags:
       - Rotas Públicas
-      summary: Listagem de vagas editado
+      summary: Listagem de vagas editado segunda vez
       description: | 
         ## Descrição
         Este endpoint retorna a lista de vagas publicadas pela empresa. Vagas ocultas não são incluídas.  
