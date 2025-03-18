@@ -1,0 +1,323 @@
+openapi: 3.0.0
+info:
+  title: Listagem e detalhes de vagas
+  description: API para listagem e detalhes de vagas
+  version: 1.0.0
+servers:
+  - url: https://api.enlizt.com/v1
+    description: Servidor de produção
+paths:
+  /public/feed/{subdomain}/positions:
+    get:
+      summary: Listagem de vagas
+      description: | 
+            ## Descrição
+            Este endpoint retorna a lista de vagas publicadas pela empresa. Vagas ocultas não são incluídas.  
+
+            ## Parâmetros  
+
+            ### Parâmetros de Caminho  
+            - **subdomain** (obrigatório): Subdomínio utilizado para identificar a empresa na página de vagas.  
+              - **Exemplo**: `sestsenat`  
+
+            ### Parâmetros de Consulta  
+
+            - **show** (opcional): Define quais vagas devem ser retornadas. Valores aceitos:  
+              - `hiring`: Somente vagas ativas que estão aceitando candidaturas (valor padrão).  
+              - `selecting`: Somente vagas ativas que não estão aceitando novas candidaturas.  
+              - `open`: Todas as vagas ativas, independente do estado de aceitação de novas candidaturas.  
+              - `closed`: Vagas arquivadas há menos de 1 ano.  
+              - `all`: Todas as vagas ativas e arquivadas há menos de 1 ano.  
+
+            - **search** (opcional): Filtra a lista de vagas pelo título ou código da vaga.  
+              - **Limite**: 50 caracteres.  
+              - **Observação**: A busca ignora diacríticos e maiúsculas.  
+
+            - **location** (opcional): Filtra a lista pelo local da vaga.  
+              - **Limite**: 50 caracteres.  
+              - **Observação**: Ignora diacríticos e maiúsculas. Para buscar por vagas remotas, o valor deve ser `"remote"`.  
+
+            - **department** (opcional): Filtra a lista pelo departamento da vaga.  
+              - **Limite**: 50 caracteres.  
+              - **Padrão**: Requer correspondência exata, ignorando diacríticos e maiúsculas.  
+              - **Busca parcial**: Se iniciar com `"~"`, busca departamentos que contenham o valor.  
+                - **Exemplo**: `"~log"` retorna vagas dos departamentos `"tecnologia"` e `"logística"`.  
+
+            - **order** (opcional): Define a ordenação da lista de vagas. Valores aceitos:  
+              - `title`: Crescente pelo título da vaga (valor padrão).  
+              - `title_desc`: Decrescente pelo título da vaga.  
+              - `date`: Crescente pela data de publicação.  
+              - `date_desc`: Decrescente pela data de publicação.  
+              - `status_title`: Crescente pelo título, com vagas ativas primeiro (aceitando candidaturas com precedência).  
+              - `status_title_desc`: Decrescente pelo título, com vagas ativas primeiro (aceitando candidaturas com precedência).  
+              - `status_date`: Crescente pela data, com vagas ativas primeiro (aceitando candidaturas com precedência).  
+              - `status_date_desc`: Decrescente pela data, com vagas ativas primeiro (aceitando candidaturas com precedência).  
+
+            - **limit** (opcional): Número de vagas a serem retornadas por resposta.  
+              - **Padrão**: `100`  
+
+            - **page** (opcional): Número da página para paginação da listagem.  
+              - **Padrão**: `1`  
+
+            ## Detalhes da Resposta  
+
+            A resposta retorna um objeto contendo:  
+
+            - **positions**: Array com a listagem de vagas disponíveis conforme os filtros aplicados. Cada item contém:  
+              - **code**: `string` - Código da vaga.  
+              - **title**: `string` - Título da vaga.  
+              - **department**: `string` - Departamento da vaga.  
+              - **location**: `string` - Local da vaga no formato `"Cidade, Sigla do Estado"`. Se for vaga remota, pode ser `null`.  
+              - **workplace**: `string` - Natureza do local de trabalho. Valores possíveis:  
+                - `'on-site'` (trabalho presencial)  
+                - `'remote'` (trabalho totalmente remoto)  
+                - `'hybrid'` (parcialmente presencial, parcialmente remoto)  
+              - **date**: `string` - Data de publicação da vaga no formato ISO 8601 (`YYYY-MM-DDTHH:mm:ss.sssZ`).  
+              - **isPublicAnnouncement**: `boolean` - Indica se o fluxo utiliza modo edital.
+              - **applicationDeadline**: `string` - Data limite para candidatura na vaga no formato ISO 8601 (`YYYY-MM-DDTHH:mm:ss.sssZ`). Pode ser `null` se não houver data limite.
+              - **allowNewApplications**: `boolean` - Indica se a vaga está recebendo novas candidaturas. Será sempre `false` se a vaga estiver arquivada (`active=false`).  
+              - **active**: `boolean` - Indica se a vaga está ativa ou arquivada.  
+              - **link**: `string` - URL para acessar a página da vaga na Plooral.  
+
+            - **total**: `integer` - Total de vagas considerando os filtros aplicados. Útil para paginação.  
+      parameters:
+      - name: subdomain
+        in: path
+        required: true
+        # description: Subdomínio utilizado para identificar a empresa na página de vagas.
+        schema:
+          type: string
+          example: zentech
+      - name: show
+        in: query
+        required: false
+        # description: Define quais vagas devem ser retornadas.
+        schema:
+          type: string
+          enum: [hiring, selecting, open, closed, all]
+          default: hiring
+      - name: search
+        in: query
+        required: false
+        # description: Filtra a lista de vagas pelo título ou código da vaga.
+        schema:
+          type: string
+          maxLength: 50
+      - name: location
+        in: query
+        required: false
+        # description: Filtra a lista pelo local da vaga.
+        schema:
+          type: string
+          maxLength: 50
+      - name: department
+        in: query
+        required: false
+        # description: Filtra a lista pelo departamento da vaga.
+        schema:
+          type: string
+          maxLength: 50
+      - name: order
+        in: query
+        required: false
+        # description: Define a ordenação da lista de vagas.
+        schema:
+          type: string
+          enum: [title, title_desc, date, date_desc, status_title, status_title_desc, status_date, status_date_desc]
+          default: title
+      - name: limit
+        in: query
+        required: false
+        # description: Número de vagas a serem retornadas por resposta.
+        schema:
+          type: integer
+          default: 100
+      - name: page
+        in: query
+        required: false
+        # description: Número da página para paginação da listagem.
+        schema:
+          type: integer
+          default: 1
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  positions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: "2080573"
+                        title:
+                          type: string
+                          example: "Auxiliar de Almoxarifado"
+                        department:
+                          type: string
+                          example: "Administrativo"
+                        location:
+                          type: string
+                          example: "São José, SC"
+                        workplace:
+                          type: string
+                          example: "on-site"
+                        date:
+                          type: string
+                          format: date-time
+                          example: "2021-08-18T20:24:02.951Z"
+                        applicationDeadline:
+                          type: string
+                          format: date-time
+                          example: null
+                        isPublicAnnouncement:
+                          type: boolean
+                          example: false
+                        allowNewApplications:
+                          type: boolean
+                          example: true
+                        active:
+                          type: boolean
+                          example: true
+                        link:
+                          type: string
+                          example: "https://zentech.plooral.live/vagas/auxiliar_de_almoxarifado-010420"
+                  total:
+                    type: integer
+                    example: 143
+  /public/feed/{subdomain}/positions/code:
+    get:
+      summary: Detalhes da vaga
+      description: | 
+            ## Descrição
+            Este endpoint retorna dados complementares de uma vaga específica publicada pela empresa. Vaga oculta não é apresentada.
+
+            ## Parâmetros
+
+            ### Parâmetros de Caminho
+            - **subdomain (obrigatório)**: Subdomínio utilizado para identificar a empresa na página de vagas (exemplo: sestsenat).
+            - **code (obrigatório)**: Código da vaga. Pode ser obtido a partir da API de listagem de vagas.
+
+            ## Detalhes da Resposta
+            - **code**: String com o código da vaga.
+            - **title**: String com o título da vaga.
+            - **department**: String com o departamento da vaga.
+            - **location**: String com o local da vaga, no formato "Cidade, Sigla do Estado". Se for vaga remota poderá ser `null`.
+            - **workplace**: String que indica a natureza do local de trabalho. Pode ser 'on-site' (trabalho presencial), 'remote' (trabalho totalmente remoto), 'hybrid' (parcialmente presencial, parcialmente remoto).
+            - **date**: String com a data de publicação da vaga, no formato ISO 8601 com 24 caracteres (YYYY-MM-DDTHH:mm:ss.sssZ).
+            - **isPublicAnnouncement**: Booleano que indica se o fluxo utiliza o modo edital.
+            - **allowNewApplications**: Booleano que indica se a vaga está recebendo novas candidaturas. Será sempre `false` se a vaga estiver arquivada (`active=false`).
+            - **active**: Booleano que indica se a vaga está ativa ou arquivada.
+            - **type**: String que indica o tipo de trabalho. Pode ser:
+              - `full_time`: Tempo integral
+              - `part_time`: Meio período
+              - `contractor`: Terceirizado
+              - `temporary`: Temporário
+              - `inter`: Estagiário
+              - `volunteer`: Voluntário
+              - `per_diem`: Diarista
+              - `other`: Outro
+            - **salary**: String com o salário. Pode ser um texto (ex: "Competitivo"), um intervalo indicando o período (ex: "Entre R$120.000,00 e R$150.000,00 anual"), ou um valor com o período (ex: "R$10.000,00 mensal").
+            - **details**: String contendo a descrição da vaga no formato markdown.
+            - **skills**: Array de strings com as competências exigidas pela vaga.
+            - **languages**: Array de strings com os idiomas exigidos pela vaga.
+            - **files**: Array de objetos dos arquivos associados à vaga. Cada objeto tem as chaves:
+              - `name`: String com a descrição do arquivo.
+              - `source`: String com a URL para o arquivo.
+            - **link**: String com a URL para acessar a página para candidatar-se à vaga na Plooral.
+      parameters:
+      - name: subdomain
+        in: path
+        required: true
+        # description: Subdomínio utilizado para identificar a empresa na página de vagas.
+        schema:
+          type: string
+          example: zentech
+      - name: code
+        in: path
+        required: true
+        # description: Código da vaga.
+        schema:
+          type: string
+          example: 2080573
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: "2068889"
+                  title:
+                    type: string
+                    example: "Consultor Comercial"
+                  department:
+                    type: string
+                    example: "Administrativo"
+                  location:
+                    type: string
+                    example: "São José dos Basílios, MA"
+                  workplace:
+                    type: string
+                    example: "on-site"
+                  date:
+                    type: string
+                    format: date-time
+                    example: "2020-10-02T17:49:02.934Z"
+                  applicationDeadline:
+                    type: string
+                    format: date-time
+                    example: null
+                  isPublicAnnouncement:
+                    type: boolean
+                    example: false
+                  allowNewApplications:
+                    type: boolean
+                    example: true
+                  active:
+                    type: boolean
+                    example: true
+                  type:
+                    type: string
+                    enum: [full_time, part_time, contractor, temporary, inter, volunteer, per_diem, other]
+                    example: full_time
+                  salary:
+                    type: string
+                    example: "R$50.000,00 semanal"
+                  details:
+                    type: string
+                    example: "Descrição da vaga em markdown."
+                  skills:
+                    type: array
+                    items:
+                      type: string
+                      example: 
+                      - "Vendas"
+                      - "Comercial"
+                  languages:
+                    type: array
+                    items:
+                      type: string
+                      example: 
+                      - "Inglês"
+                      - "Alemão"
+                  files:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: "Documento de Apresentação"
+                        source:
+                          type: string
+                          example: "https://zentech.plooral.live/vagas"
+                  link:
+                    type: string
+                    example: "https://zentech.plooral.live/vagas/8b13ea30-04d7-11eb-9aec-abd2b4aa5bba/candidatar"
